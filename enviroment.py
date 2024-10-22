@@ -39,37 +39,29 @@ class SudokuEnv:
     def step(self, action):
         """
         Takes an action and updates the environment.
-
         :param action: A tuple (row, col, num) representing the cell to fill and the number to place.
         :return: A tuple (new_state, reward, done).
                  - new_state: The updated board after the action.
                  - reward: The reward based on the agent's action.
                  - done: A boolean indicating whether the puzzle is solved.
         """
-
         if action is not None:
             row, col, num = action
-            if self.current_board[row][col] != 0:
-                print(f"Cell ({row}, {col}) is already filled. No action taken.")
-                return self.current_board, self.reward, self.done
-
-            if num == self.solution_board[row][col]:
-                self.current_board[row][col] = num
-                self.reward += 10
-                self.done = self.check_done()
-                self.render()
-                return self.current_board, self.reward, self.done
-
-            else:
-                if self.reward >= 30:
-                    self.reward -= 30
+            if self.current_board[row][col] == 0:  # Make sure it's not a filled cell
+                if num == self.solution_board[row][col]:
+                    self.current_board[row][col] = num
+                    reward = 80
+                    done = self.check_done()
+                    return self.current_board, reward, done
                 else:
-                    self.reward = 0
-                self.render()
-                return self.current_board, self.reward, self.done
-
-
-
+                    reward = -30
+                    return self.current_board, reward, False
+            else:
+                # If the cell is already filled, return a negative reward
+                reward = -1
+                return self.current_board, reward, False
+        # If action is None, return the current state with no reward
+        return self.current_board, 0, False
 
 
     def render(self):
